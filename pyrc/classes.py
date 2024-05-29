@@ -22,12 +22,10 @@ class AsyncDict(dict):
 class IRCUser:
     """
     Object denoting an IRC user
+    :param user_string: The string that identifies the user (either nick or nick!user@host)
+    :param chmapping: The channel mode mapping for the server this user originates from
     """
     def __init__(self, user_string: str, chmapping: Dict[str, str]):
-        """
-        :param user_string: The string that identifies the user (either nick or nick!user@host)
-        :param chmapping: The channel mode mapping for the server this user originates from
-        """
         self.raw = user_string
         self.raw.lstrip(":")
         self.chmapping = chmapping
@@ -63,11 +61,9 @@ class IRCUser:
 class IRCChannel:
     """
     Class denoting an IRC server channel
+    :param name: The name of the channel. Additional data will be added to the channel when it becomes available
     """
     def __init__(self, name: str):
-        """
-        :param name: The name of the channel. Additional data will be added to the channel when it becomes available
-        """
         self.name = name
         self.chmodes = None
         self.is_caching = False
@@ -91,6 +87,11 @@ class IRCChannel:
 class Context:
     """
     Event context class for event callbacks
+    :param raw: The raw command string, if the callback needs to parse it further
+    :param author: The IRCUser object of the person who caused this event
+    :param channel: The channel that this command targets, if any
+    :param message: The trailer of the command (May be an actual message, or a parameter that includes spaces)
+    :param ctcp: The CTCP query string found in the message, if any. Will only be present if the command is a PRIVMSG, per spec
     """
     def __init__(
         self,
@@ -100,15 +101,8 @@ class Context:
         message: Union[str, None] = None,
         ctcp: Union[str, None] = None
     ):
-        """
-        :param raw: The raw command string, if the callback needs to parse it further
-        :param author: The IRCUser object of the person who caused this event
-        :param channel: The channel that this command targets, if any
-        :param message: The trailer of the command (May be an actual message, or a parameter that includes spaces)
-        :param ctcp: The CTCP query string found in the message, if any. Will only be present if the command is a PRIVMSG, per spec
-        """
         self.author = author
         self.channel = channel
         self.message = message
         self.raw = raw
-        self.ctcq = ctcp
+        self.ctcp = ctcp

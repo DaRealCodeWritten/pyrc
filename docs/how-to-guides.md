@@ -1,6 +1,6 @@
 # How to set up IRCClient for the first time
 Setting up an IRC client is fairly simple
-```
+```py
 import pyrc
 import asyncio
 
@@ -15,7 +15,7 @@ This is a fairly basic program that won't really do anything, but it provides a 
 
 # Setting up an event
 pyrc allows for a wide variety of events to be listened to via callbacks
-```
+```py
 client = IRCClient()
 
 # Using a decorator
@@ -28,4 +28,4 @@ async def on_ready():
     print("ready!")
 client.event(on_ready)
 ```
-Events like `on_ready` will not receive any args, nor should they expect any. Other events (such as PRIVMSG, NOTICE, etc) will receive a [pyrc.Context](reference.md#pyrccontext) object describing the event context
+Events like `on_ready` will not receive any args, nor should they expect any. Other events (such as PRIVMSG, NOTICE, etc) will receive a Context object describing the event context

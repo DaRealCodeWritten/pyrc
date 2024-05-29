@@ -5,4 +5,3 @@ This documentation is for the `py-rc` library, meant to provide an asynchronous 
 [Reference](reference.md)
 [How-To Guides](how-to-guides.md)
 [Explanation](explanation.md)
-[Tutorials](tutorials.md)

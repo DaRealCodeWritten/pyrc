@@ -12,11 +12,11 @@ Main client module for pyirc. This should always be imported
 
 
 class IRCClient:
-    def __init__(self, **kwargs):
-        """
+    """
         Client class for setting up a connection to an IRC server
         :param kwargs: Keywords to pass into the IRCClient constructor
-        """
+    """
+    def __init__(self, **kwargs):
         self.host: Union[None, str] = None
         self.port: Union[None, int] = None
         self.ctcpchar = bytes("\x01", "UTF-8")

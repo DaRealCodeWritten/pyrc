@@ -1,13 +1,5 @@
-## pyrc.IRCClient
-::: pyrc.IRCClient
+# Client
+[Client reference](reference/client.md)
 
 # Classes
-
-## pyrc.IRCUser
-::: pyrc.IRCUser
-
-## pyrc.IRCChannel
-::: pyrc.IRCChannel
-
-## pyrc.Context
-::: pyrc.Context
+[Classes reference](reference/classes.md)

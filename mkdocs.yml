@@ -16,6 +16,8 @@ plugins:
 nav:
   - Python IRC Docs: index.md
   - How-To Guides: how-to-guides.md
-  - tutorials.md
-  - reference.md
+  - References:
+    - References: reference.md
+    - Client API References: reference/client.md
+    - Client Classes Reference: reference/classes.md
   - explanation.md
