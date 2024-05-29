@@ -226,7 +226,7 @@ class IRCClient:
         result = False
         done = asyncio.Event()
         async def inner(context):
-            nonlocal result, done
+            nonlocal result
             if check(context):
                 result = context
                 done.set()
