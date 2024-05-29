@@ -1,0 +1,21 @@
+site_name: Python IRC Docs
+
+theme: 
+  name: "material"
+
+watch:
+  - pyrc
+
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: sphinx
+
+nav:
+  - Python IRC Docs: index.md
+  - How-To Guides: how-to-guides.md
+  - tutorials.md
+  - reference.md
+  - explanation.md
