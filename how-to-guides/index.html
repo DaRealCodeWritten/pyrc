@@ -12,7 +12,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../tutorials/">
+        <link rel="next" href="../reference/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -205,22 +205,37 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../tutorials/" class="md-nav__link">
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
   
   <span class="md-ellipsis">
-    Tutorials
+    References
   </span>
   
 
-      </a>
-    </li>
-  
-
-    
-      
-      
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
   
@@ -230,11 +245,61 @@
         
   
   <span class="md-ellipsis">
-    Reference
+    References
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Client API References
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/classes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Client Classes Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -294,7 +359,7 @@
 
 <h1 id="how-to-set-up-ircclient-for-the-first-time">How to set up IRCClient for the first time</h1>
 <p>Setting up an IRC client is fairly simple</p>
-<pre><code>import pyrc
+<pre><code class="language-py">import pyrc
 import asyncio
 
 client = pyrc.IRCClient()
@@ -307,7 +372,7 @@ asyncio.run(main())
 <p>This is a fairly basic program that won't really do anything, but it provides a good starting point for later work!</p>
 <h1 id="setting-up-an-event">Setting up an event</h1>
 <p>pyrc allows for a wide variety of events to be listened to via callbacks</p>
-<pre><code>client = IRCClient()
+<pre><code class="language-py">client = IRCClient()
 
 # Using a decorator
 @client.event
@@ -319,7 +384,7 @@ async def on_ready():
     print(&quot;ready!&quot;)
 client.event(on_ready)
 </code></pre>
-<p>Events like <code>on_ready</code> will not receive any args, nor should they expect any. Other events (such as PRIVMSG, NOTICE, etc) will receive a <a href="../reference/#pyrccontext">pyrc.Context</a> object describing the event context</p>
+<p>Events like <code>on_ready</code> will not receive any args, nor should they expect any. Other events (such as PRIVMSG, NOTICE, etc) will receive a Context object describing the event context</p>
 
 
 
