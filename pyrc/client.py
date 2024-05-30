@@ -222,6 +222,8 @@ class IRCClient:
         :param check: A Callable that checks the context of the event and returns a bool
         :param timeout: Will raise a TimeoutError if the time is exceeded, defaults to 30
         :raises asyncio.TimeoutError: If the event is not triggered in time
+        :return: The Context of the event that passed `check`
+        :rtype: pyrc.Context
         """
         result = False
         done = asyncio.Event()
