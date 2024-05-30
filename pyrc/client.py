@@ -15,6 +15,9 @@ class IRCClient:
     """
         Client class for setting up a connection to an IRC server
         :param kwargs: Keywords to pass into the IRCClient constructor
+        :cvar host: a string representing the host that the client is connected to
+        :cvar port: the port number the client is connected to
+        :cvar caps: A list of IRCv3 capabilities the client can support
     """
     def __init__(self, **kwargs):
         self.host: Union[None, str] = None
@@ -234,7 +237,7 @@ class IRCClient:
                 done.set()
         self.event(inner, event)
         try:
-            with asyncio.timeout(timeout):
+            async with asyncio.timeout(timeout):
                 await done.wait()
         finally:
             self._events[event].remove(inner)

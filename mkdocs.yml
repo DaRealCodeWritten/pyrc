@@ -2,6 +2,8 @@ site_name: Python IRC Docs
 
 theme: 
     name: material
+    palette:
+        scheme: slate
     icon:
         repo: octicons/mark-github-16
 
@@ -24,7 +26,9 @@ plugins:
 
 nav:
     - Python IRC Docs: index.md
-    - How-To Guides: how-to-guides.md
+    - How-To Guides:
+        - Setting up an IRCClient for the first time: howto/first-client.md
+        - Setting up event hooks for an IRCClient: howto/first-events.md
     - References:
         - Client API References: reference/client.md
         - Client Classes Reference: reference/classes.md

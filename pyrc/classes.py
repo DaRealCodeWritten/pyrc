@@ -92,6 +92,11 @@ class Context:
     :param channel: The channel that this command targets, if any
     :param message: The trailer of the command (May be an actual message, or a parameter that includes spaces)
     :param ctcp: The CTCP query string found in the message, if any. Will only be present if the command is a PRIVMSG, per spec
+    :cvar raw: The raw string that triggered this event
+    :cvar author: The IRCUser that triggered this event, if any
+    :cvar channel: The IRCChannel this event was triggered in, if any
+    :cvar message: The trailer for the event (is not always a message), if any
+    :cvar ctcp: The CTCP data in this event, if any
     """
     def __init__(
         self,
