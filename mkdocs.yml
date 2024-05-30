@@ -1,31 +1,22 @@
 site_name: Python IRC Docs
 
 theme: 
-    name: material
-    icon:
-        repo: octicons/mark-github-16
+  name: "material"
 
 watch:
-    - pyrc
-
-repo_url: https://github.com/DaRealCodeWritten/pyrc
-repo_name: pyrc
+  - pyrc
 
 plugins:
-    - git-authors
-    - git-revision-date-localized:
-        type: datetime
-        enable_creation_date: true
-    - mkdocstrings:
-        handlers:
-            python:
-                options:
-                    docstring_style: sphinx
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: sphinx
 
 nav:
-    - Python IRC Docs: index.md
-    - How-To Guides: how-to-guides.md
-    - References:
-        - Client API References: reference/client.md
-        - Client Classes Reference: reference/classes.md
-    - explanation.md
+  - Python IRC Docs: index.md
+  - How-To Guides: how-to-guides.md
+  - References:
+    - Client API References: reference/client.md
+    - Client Classes Reference: reference/classes.md
+  - explanation.md

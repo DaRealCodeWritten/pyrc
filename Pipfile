@@ -10,8 +10,6 @@ pysasl = "*"
 mkdocs = "*"
 mkdocstrings = {extras = ["python"], version = "*"}
 mkdocs-material = "*"
-mkdocs-git-revision-date-localized-plugin = "*"
-mkdocs-git-authors-plugin = "*"
 
 [requires]
 python_version = "3.12"
