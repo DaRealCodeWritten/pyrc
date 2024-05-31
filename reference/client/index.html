@@ -736,7 +736,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of IRCv3 capabilities the client can support</p>
+                <p>A list of IRCv3 capabilities the client can support. If this list is not empty then the client will attempt cap negotiation</p>
               </div>
             </td>
           </tr>
@@ -981,7 +981,7 @@
 <span class="sd">        :param kwargs: Keywords to pass into the IRCClient constructor</span>
 <span class="sd">        :cvar host: a string representing the host that the client is connected to</span>
 <span class="sd">        :cvar port: the port number the client is connected to</span>
-<span class="sd">        :cvar caps: A list of IRCv3 capabilities the client can support</span>
+<span class="sd">        :cvar caps: A list of IRCv3 capabilities the client can support. If this list is not empty then the client will attempt cap negotiation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1060,7 +1060,7 @@
                     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">plaintext</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;PING&quot;</span><span class="p">,</span> <span class="s2">&quot;PONG&quot;</span><span class="p">))</span>
                     <span class="k">continue</span>
                 <span class="n">params</span> <span class="o">=</span> <span class="n">plaintext</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="n">author</span> <span class="o">=</span> <span class="n">IRCUser</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">chmodemap</span><span class="p">)</span>
+                <span class="n">author</span> <span class="o">=</span> <span class="n">IRCUser</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">chmodemap</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
                 <span class="n">verb</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">verb</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;422&quot;</span><span class="p">,</span> <span class="s2">&quot;376&quot;</span><span class="p">]:</span>
                     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_event</span><span class="p">(</span><span class="s2">&quot;ready&quot;</span><span class="p">)</span>
@@ -1182,7 +1182,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRIVMSG </span><span class="si">{</span><span class="n">nick</span><span class="si">}</span><span class="s2"> :</span><span class="se">\x01</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="se">\x01</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">check</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">check</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">args</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Waits for a specified event to occur, and returns the result</span>
 
 <span class="sd">        :param event: The name of the event to wait for</span>
@@ -2017,7 +2017,7 @@
 
 
 <h2 id="pyrc.IRCClient.wait_for" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">wait_for</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">check</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">wait_for</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="k">lambda</span> <span class="n">args</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-async"><code>async</code></small>
@@ -2067,7 +2067,7 @@
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>lambda args: True</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2158,7 +2158,7 @@
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
-<span class="normal">244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">check</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+<span class="normal">244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">check</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">args</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Waits for a specified event to occur, and returns the result</span>
 
 <span class="sd">    :param event: The name of the event to wait for</span>

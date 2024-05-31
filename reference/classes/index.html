@@ -447,6 +447,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pyrc.classes.IRCObjectSendable" class="md-nav__link">
+    <span class="md-ellipsis">
+      IRCObjectSendable
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IRCObjectSendable">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pyrc.classes.IRCObjectSendable.send_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      send_to
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pyrc.classes.IRCUser" class="md-nav__link">
     <span class="md-ellipsis">
       IRCUser
@@ -558,6 +582,30 @@
   <a href="#pyrc.classes.IRCChannel.sync" class="md-nav__link">
     <span class="md-ellipsis">
       sync
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pyrc.classes.IRCObjectSendable" class="md-nav__link">
+    <span class="md-ellipsis">
+      IRCObjectSendable
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IRCObjectSendable">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pyrc.classes.IRCObjectSendable.send_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      send_to
     </span>
   </a>
   
@@ -841,33 +889,33 @@
 
               <details class="quote">
                 <summary>Source code in <code>pyrc/classes.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Event context class for event callbacks</span>
 <span class="sd">    :param raw: The raw command string, if the callback needs to parse it further</span>
@@ -929,6 +977,8 @@
 
 
     <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="pyrc.classes.IRCObjectSendable" href="#pyrc.classes.IRCObjectSendable">IRCObjectSendable</a></code></p>
 
 
       <p>Class denoting an IRC server channel</p>
@@ -959,46 +1009,115 @@
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>client</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The IRCClient that instantiated this IRCChannel</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCChannel.name">name</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of this channel</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCChannel.chmodes">chmodes</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The channel modes for this channel, may be None if lazyloading (default)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCChannel.users">users</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A set of IRCUser objects in this channel</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
               <details class="quote">
                 <summary>Source code in <code>pyrc/classes.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">IRCChannel</span><span class="p">:</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">IRCChannel</span><span class="p">(</span><span class="n">IRCObjectSendable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class denoting an IRC server channel</span>
 <span class="sd">    :param name: The name of the channel. Additional data will be added to the channel when it becomes available</span>
+<span class="sd">    :param client: The IRCClient that instantiated this IRCChannel</span>
+<span class="sd">    :cvar name: The name of this channel</span>
+<span class="sd">    :cvar chmodes: The channel modes for this channel, may be None if lazyloading (default)</span>
+<span class="sd">    :cvar users: A set of IRCUser objects in this channel</span>
+<span class="sd">    :type users: Set[IRCUser]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chmodes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_caching</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1043,16 +1162,16 @@
 
             <details class="quote">
               <summary>Source code in <code>pyrc/classes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sync the cached (temporary) userlist to the permanent userlist. Will do nothing if the channel is not marked as actively caching</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1080,6 +1199,185 @@
 
 
 
+<h2 id="pyrc.classes.IRCObjectSendable" class="doc doc-heading">
+            <code>IRCObjectSendable</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Object class for IRC objects, implements a .send_to() method for sending messages that target this object</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>client</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>IRCClient object that this object is bound to</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sendable</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A string that denotes the PRIVMSG/NOTICE target</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+              <details class="quote">
+                <summary>Source code in <code>pyrc/classes.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">IRCObjectSendable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Object class for IRC objects, implements a .send_to() method for sending messages that target this object</span>
+<span class="sd">    :param client: IRCClient object that this object is bound to</span>
+<span class="sd">    :param sendable: A string that denotes the PRIVMSG/NOTICE target</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">sendable</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sendable</span> <span class="o">=</span> <span class="n">sendable</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sends a message to the target of this IRC object</span>
+
+<span class="sd">        :param message: The message to send</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRIVMSG </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sendable</span><span class="si">}</span><span class="s2"> :</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pyrc.classes.IRCObjectSendable.send_to" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">send_to</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Sends a message to the target of this IRC object</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>message</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The message to send</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>pyrc/classes.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">send_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sends a message to the target of this IRC object</span>
+
+<span class="sd">    :param message: The message to send</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PRIVMSG </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sendable</span><span class="si">}</span><span class="s2"> :</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="pyrc.classes.IRCUser" class="doc doc-heading">
             <code>IRCUser</code>
 
@@ -1088,6 +1386,8 @@
 
 
     <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="pyrc.classes.IRCObjectSendable" href="#pyrc.classes.IRCObjectSendable">IRCObjectSendable</a></code></p>
 
 
       <p>Object denoting an IRC user</p>
@@ -1132,30 +1432,79 @@
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>client</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The IRCClient that instantiated this IRCUser</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCUser.raw">raw</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The raw userstring for this User</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCUser.nick">nick</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The nickname of this User</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCUser.host">host</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The host/vhost of this User, may be None if this user is lazily loaded (default)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="pyrc.classes.IRCUser.user">user</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The username of this User, may be None if this user is lazily loaded (default)</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
               <details class="quote">
                 <summary>Source code in <code>pyrc/classes.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
@@ -1173,13 +1522,42 @@
 <span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
-<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">IRCUser</span><span class="p">:</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">IRCUser</span><span class="p">(</span><span class="n">IRCObjectSendable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Object denoting an IRC user</span>
 <span class="sd">    :param user_string: The string that identifies the user (either nick or nick!user@host)</span>
 <span class="sd">    :param chmapping: The channel mode mapping for the server this user originates from</span>
+<span class="sd">    :param client: The IRCClient that instantiated this IRCUser</span>
+<span class="sd">    :cvar raw: The raw userstring for this User</span>
+<span class="sd">    :cvar nick: The nickname of this User</span>
+<span class="sd">    :cvar host: The host/vhost of this User, may be None if this user is lazily loaded (default)</span>
+<span class="sd">    :cvar user: The username of this User, may be None if this user is lazily loaded (default)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chmapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chmapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">client</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">user_string</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chmapping</span> <span class="o">=</span> <span class="n">chmapping</span>
@@ -1188,6 +1566,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chmodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_chmodes</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chmodes</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span>
