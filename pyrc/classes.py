@@ -19,13 +19,36 @@ class AsyncDict(dict):
             yield key, value
 
 
-class IRCUser:
+class IRCObjectSendable:
+    """
+    Object class for IRC objects, implements a .send_to() method for sending messages that target this object
+    :param client: IRCClient object that this object is bound to
+    :param sendable: A string that denotes the PRIVMSG/NOTICE target
+    """
+    def __init__(self, client, sendable: str):
+        self.client = client
+        self.sendable = sendable
+    
+    async def send_to(self, message: str):
+        """Sends a message to the target of this IRC object
+
+        :param message: The message to send
+        """
+        await self.client.send(f"PRIVMSG {self.sendable} :{message}")
+
+
+class IRCUser(IRCObjectSendable):
     """
     Object denoting an IRC user
     :param user_string: The string that identifies the user (either nick or nick!user@host)
     :param chmapping: The channel mode mapping for the server this user originates from
+    :param client: The IRCClient that instantiated this IRCUser
+    :cvar raw: The raw userstring for this User
+    :cvar nick: The nickname of this User
+    :cvar host: The host/vhost of this User, may be None if this user is lazily loaded (default)
+    :cvar user: The username of this User, may be None if this user is lazily loaded (default)
     """
-    def __init__(self, user_string: str, chmapping: Dict[str, str]):
+    def __init__(self, user_string: str, chmapping: Dict[str, str], client):
         self.raw = user_string
         self.raw.lstrip(":")
         self.chmapping = chmapping
@@ -34,6 +57,7 @@ class IRCUser:
         if self.user is not None:
             self.chmodes = self._get_chmodes()
             self.user.lstrip("".join(self.chmodes))
+        super().__init__(client, self.nick)
 
     def __str__(self):
         return self.nick
@@ -58,17 +82,23 @@ class IRCUser:
         return modes
 
 
-class IRCChannel:
+class IRCChannel(IRCObjectSendable):
     """
     Class denoting an IRC server channel
     :param name: The name of the channel. Additional data will be added to the channel when it becomes available
+    :param client: The IRCClient that instantiated this IRCChannel
+    :cvar name: The name of this channel
+    :cvar chmodes: The channel modes for this channel, may be None if lazyloading (default)
+    :cvar users: A set of IRCUser objects in this channel
+    :type users: Set[IRCUser]
     """
-    def __init__(self, name: str):
+    def __init__(self, name: str, client):
         self.name = name
         self.chmodes = None
         self.is_caching = False
         self.users = set()
         self.cache = set()
+        super().__init__(client, self.name)
 
     def sync(self):
         """

@@ -25,7 +25,7 @@ class _DefaultEventHandlers:
         parse = preparse[1].split(" :")
         nicks = parse[1].split(" ")
         for nick in nicks:
-            ctx.channel.cache.add(pyrc.IRCUser(nick, self.client.chmodemap))
+            ctx.channel.cache.add(pyrc.IRCUser(nick, self.client.chmodemap, self.client))
             await asyncio.sleep(0)
     
     async def on_366(self, ctx):
@@ -42,7 +42,7 @@ class _DefaultEventHandlers:
         channels = channelstr.split(" ")
         for channel in channels:
             await asyncio.sleep(0)
-            self.client.channels[pyrc.IRCChannel(channel)] = []
+            self.client.channels[pyrc.IRCChannel(channel, self.client)] = []
 
     async def on_ready(self):
         """

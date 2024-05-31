@@ -17,7 +17,7 @@ class IRCClient:
         :param kwargs: Keywords to pass into the IRCClient constructor
         :cvar host: a string representing the host that the client is connected to
         :cvar port: the port number the client is connected to
-        :cvar caps: A list of IRCv3 capabilities the client can support
+        :cvar caps: A list of IRCv3 capabilities the client can support. If this list is not empty then the client will attempt cap negotiation
     """
     def __init__(self, **kwargs):
         self.host: Union[None, str] = None
@@ -96,7 +96,7 @@ class IRCClient:
                     await self.send(plaintext.replace("PING", "PONG"))
                     continue
                 params = plaintext.split(" ", 2)
-                author = IRCUser(params[0], self.chmodemap)
+                author = IRCUser(params[0], self.chmodemap, self)
                 verb = params[1]
                 if verb in ["422", "376"]:
                     await self._dispatch_event("ready")
@@ -218,7 +218,7 @@ class IRCClient:
         """
         await self.send(f"PRIVMSG {nick} :\x01{query}\x01")
     
-    async def wait_for(self, event: str, check: Callable, timeout: float = 30):
+    async def wait_for(self, event: str, check: Callable = lambda args: True, timeout: float = 30):
         """Waits for a specified event to occur, and returns the result
 
         :param event: The name of the event to wait for

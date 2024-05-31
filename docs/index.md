@@ -1,2 +1,2 @@
 # Welcome to the py-rc documentation!
-This documentation is for the `py-rc` library, meant to provide an asynchronous IRC client library written in Python.
+This documentation is for the `py-rc` library, meant to provide an asynchronous IRC client library written in Python. This library and documentation assume you have at least basic knowledge of python and async. If you don't, then maybe you should learn them before trying your hand with this library :)
