@@ -42,7 +42,8 @@ class _DefaultEventHandlers:
         channels = channelstr.split(" ")
         for channel in channels:
             await asyncio.sleep(0)
-            self.client.channels[pyrc.IRCChannel(channel, self.client)] = []
+            chan = pyrc.IRCChannel(channel, self.client)
+            self.client.channels.add(chan)
 
     async def on_ready(self):
         """

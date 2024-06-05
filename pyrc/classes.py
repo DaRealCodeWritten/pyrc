@@ -43,10 +43,10 @@ class IRCUser(IRCObjectSendable):
     :param user_string: The string that identifies the user (either nick or nick!user@host)
     :param chmapping: The channel mode mapping for the server this user originates from
     :param client: The IRCClient that instantiated this IRCUser
-    :cvar raw: The raw userstring for this User
-    :cvar nick: The nickname of this User
-    :cvar host: The host/vhost of this User, may be None if this user is lazily loaded (default)
-    :cvar user: The username of this User, may be None if this user is lazily loaded (default)
+    :ivar raw: The raw userstring for this User
+    :ivar nick: The nickname of this User
+    :ivar host: The host/vhost of this User, may be None if this user is lazily loaded (default)
+    :ivar user: The username of this User, may be None if this user is lazily loaded (default)
     """
     def __init__(self, user_string: str, chmapping: Dict[str, str], client):
         self.raw = user_string
@@ -72,7 +72,7 @@ class IRCUser(IRCObjectSendable):
         """
         Recursively walks the user's nickname until all prefixes for this user have been found
         :param modes: The modes found on the user so far, or None
-        :next_ind: the index to check. This should be +1 for every iteration to avoid infinite recursions
+        :param next_ind: the index to check. This should be +1 for every iteration to avoid infinite recursions
         """
         modes = [] if modes is None else modes
         if self.raw[next_ind] in self.chmapping.values():
@@ -87,9 +87,9 @@ class IRCChannel(IRCObjectSendable):
     Class denoting an IRC server channel
     :param name: The name of the channel. Additional data will be added to the channel when it becomes available
     :param client: The IRCClient that instantiated this IRCChannel
-    :cvar name: The name of this channel
-    :cvar chmodes: The channel modes for this channel, may be None if lazyloading (default)
-    :cvar users: A set of IRCUser objects in this channel
+    :ivar name: The name of this channel
+    :ivar chmodes: The channel modes for this channel, may be None if lazyloading (default)
+    :ivar users: A set of IRCUser objects in this channel
     :type users: Set[IRCUser]
     """
     def __init__(self, name: str, client):
@@ -122,11 +122,12 @@ class Context:
     :param channel: The channel that this command targets, if any
     :param message: The trailer of the command (May be an actual message, or a parameter that includes spaces)
     :param ctcp: The CTCP query string found in the message, if any. Will only be present if the command is a PRIVMSG, per spec
-    :cvar raw: The raw string that triggered this event
-    :cvar author: The IRCUser that triggered this event, if any
-    :cvar channel: The IRCChannel this event was triggered in, if any
-    :cvar message: The trailer for the event (is not always a message), if any
-    :cvar ctcp: The CTCP data in this event, if any
+    :param event: The event that instantiated this Context
+    :ivar raw: The raw string that triggered this event
+    :ivar author: The IRCUser that triggered this event, if any
+    :ivar channel: The IRCChannel this event was triggered in, if any
+    :ivar message: The trailer for the event (is not always a message), if any
+    :ivar ctcp: The CTCP data in this event, if any
     """
     def __init__(
         self,
@@ -134,10 +135,12 @@ class Context:
         author: Union[IRCUser, None] = None,
         channel: Union[IRCChannel, None] = None,
         message: Union[str, None] = None,
-        ctcp: Union[str, None] = None
+        ctcp: Union[str, None] = None,
+        event: Union[str, None] = None
     ):
         self.author = author
         self.channel = channel
         self.message = message
         self.raw = raw
         self.ctcp = ctcp
+        self.event = event

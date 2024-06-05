@@ -15,3 +15,16 @@ This is a fairly basic program that won't really do anything, but it provides a 
 
 # Sending your first message
 We've connected to IRC, but now we wanna send messages, so lets do it!
+```py
+import asyncio
+import pyrc
+
+client = pyrc.IRCClient()
+
+async def main():
+    await client.connect("127.0.0.1", 6667, "Foo")  # Connect to an IRCd at 127.0.0.1, port 6667, with username 'Foo'
+    chan = await client.join_channel("#spam")  # Join the channel '#spam'
+    await chan.send_to("Hello, world!")  # Hello, world!
+
+asyncio.run(main())
+```

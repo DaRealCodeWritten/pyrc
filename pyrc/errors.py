@@ -8,3 +8,6 @@ defining error handlers in client-side code
 
 class NotConnectedError(Exception):
     pass
+
+class JoinChannelFailed(Exception):
+    pass
