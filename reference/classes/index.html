@@ -820,6 +820,20 @@
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>event</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[str, None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event that instantiated this Context</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -915,7 +929,10 @@
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
-<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Event context class for event callbacks</span>
 <span class="sd">    :param raw: The raw command string, if the callback needs to parse it further</span>
@@ -923,11 +940,12 @@
 <span class="sd">    :param channel: The channel that this command targets, if any</span>
 <span class="sd">    :param message: The trailer of the command (May be an actual message, or a parameter that includes spaces)</span>
 <span class="sd">    :param ctcp: The CTCP query string found in the message, if any. Will only be present if the command is a PRIVMSG, per spec</span>
-<span class="sd">    :cvar raw: The raw string that triggered this event</span>
-<span class="sd">    :cvar author: The IRCUser that triggered this event, if any</span>
-<span class="sd">    :cvar channel: The IRCChannel this event was triggered in, if any</span>
-<span class="sd">    :cvar message: The trailer for the event (is not always a message), if any</span>
-<span class="sd">    :cvar ctcp: The CTCP data in this event, if any</span>
+<span class="sd">    :param event: The event that instantiated this Context</span>
+<span class="sd">    :ivar raw: The raw string that triggered this event</span>
+<span class="sd">    :ivar author: The IRCUser that triggered this event, if any</span>
+<span class="sd">    :ivar channel: The IRCChannel this event was triggered in, if any</span>
+<span class="sd">    :ivar message: The trailer for the event (is not always a message), if any</span>
+<span class="sd">    :ivar ctcp: The CTCP data in this event, if any</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -935,13 +953,15 @@
         <span class="n">author</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">IRCUser</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">channel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">IRCChannel</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">message</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">ctcp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ctcp</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">event</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">author</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">raw</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ctcp</span> <span class="o">=</span> <span class="n">ctcp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span> <span class="o">=</span> <span class="n">event</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -1106,9 +1126,9 @@
 <span class="sd">    Class denoting an IRC server channel</span>
 <span class="sd">    :param name: The name of the channel. Additional data will be added to the channel when it becomes available</span>
 <span class="sd">    :param client: The IRCClient that instantiated this IRCChannel</span>
-<span class="sd">    :cvar name: The name of this channel</span>
-<span class="sd">    :cvar chmodes: The channel modes for this channel, may be None if lazyloading (default)</span>
-<span class="sd">    :cvar users: A set of IRCUser objects in this channel</span>
+<span class="sd">    :ivar name: The name of this channel</span>
+<span class="sd">    :ivar chmodes: The channel modes for this channel, may be None if lazyloading (default)</span>
+<span class="sd">    :ivar users: A set of IRCUser objects in this channel</span>
 <span class="sd">    :type users: Set[IRCUser]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
@@ -1552,10 +1572,10 @@
 <span class="sd">    :param user_string: The string that identifies the user (either nick or nick!user@host)</span>
 <span class="sd">    :param chmapping: The channel mode mapping for the server this user originates from</span>
 <span class="sd">    :param client: The IRCClient that instantiated this IRCUser</span>
-<span class="sd">    :cvar raw: The raw userstring for this User</span>
-<span class="sd">    :cvar nick: The nickname of this User</span>
-<span class="sd">    :cvar host: The host/vhost of this User, may be None if this user is lazily loaded (default)</span>
-<span class="sd">    :cvar user: The username of this User, may be None if this user is lazily loaded (default)</span>
+<span class="sd">    :ivar raw: The raw userstring for this User</span>
+<span class="sd">    :ivar nick: The nickname of this User</span>
+<span class="sd">    :ivar host: The host/vhost of this User, may be None if this user is lazily loaded (default)</span>
+<span class="sd">    :ivar user: The username of this User, may be None if this user is lazily loaded (default)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chmapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">client</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">user_string</span>
@@ -1581,7 +1601,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recursively walks the user&#39;s nickname until all prefixes for this user have been found</span>
 <span class="sd">        :param modes: The modes found on the user so far, or None</span>
-<span class="sd">        :next_ind: the index to check. This should be +1 for every iteration to avoid infinite recursions</span>
+<span class="sd">        :param next_ind: the index to check. This should be +1 for every iteration to avoid infinite recursions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">modes</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">modes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">modes</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">[</span><span class="n">next_ind</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chmapping</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
