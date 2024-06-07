@@ -11,3 +11,9 @@ class NotConnectedError(Exception):
 
 class JoinChannelFailed(Exception):
     pass
+
+class ExtensionFailed(Exception):
+    pass
+
+class ExtensionNotFound(Exception):
+    pass

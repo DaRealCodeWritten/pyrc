@@ -2,8 +2,10 @@ import asyncio
 import logging
 import pyrc
 import traceback
+import importlib
 from pyrc.errors import *  # noqa: F403
 from pyrc.classes import *  # noqa: F403
+from pyrc.ext import extension
 from typing import Union, Dict, Callable, List, Literal
 
 
@@ -17,7 +19,6 @@ class IRCClient:
         Client class for setting up a connection to an IRC server
         :ivar host: a string representing the host that the client is connected to
         :ivar port: the port number the client is connected to
-        :ivar caps: A list of IRCv3 capabilities the client can support. If this list is not empty then the client will attempt cap negotiation
     """
     def __init__(self, **kwargs):
         self._events: Dict[str, List[Callable]] = {}
@@ -29,13 +30,14 @@ class IRCClient:
             ["NOTICE",]: "notice",
             ["403", "471", "473", "474", "475"]: "join_fail"
         }
+        self._exts = {}
+        self._depmap = {}
         self.host: Union[None, str] = None
         self.port: Union[None, int] = None
         self.ctcpchar = bytes("\x01", "UTF-8")
         self.cmdbuf = []
         self.cmdwait = False
-        self.caps: List[str] = []
-        self.chmodemap: Dict[str, str] = {}
+        self.chmodemap: Dict[str, List[extension.Extension]] = {}
         self.channels = set()
         override_default_events: Union[None, Callable] = kwargs.get("override_default_events")
         self.load_behavior: Union[Literal["lazy"], Literal["active"]] = kwargs.get("loading", "lazy")
@@ -44,6 +46,40 @@ class IRCClient:
             return
         pyrc.setup(self)
     
+    def add_module(self, module):
+        """Adds and loads a new module to the client ecosystem
+
+        :param module: The module instance to load
+        :type module: pyrc.ext.extension.Extension
+        :raises ExtensionFailed: If the module could not be initialized
+        """
+        for cap in module.depends:
+            if self._depmap.get(cap) is None:
+                for cap in module.depends:
+                    self._depmap.pop(cap, None)
+                raise ExtensionFailed(f"Module '{module.__name__}' failed to load. One or more dependencies was not met")
+        for prov in module.provides:
+            self._depmap.setdefault(prov, [])
+        self._exts[module.name] = module
+
+    async def remove_module(self, module_name: str):
+        """Removes a given module from the client
+
+        :param module_name: The module name to look for and remove
+        :raises ExtensionNotFound: If the module is not found
+        """
+        mod = self._exts.get(module_name)
+        if mod is None:
+            raise ExtensionNotFound(f"Module '{module_name}' is either not loaded, or partially initialized")
+        self._exts.pop(module_name)
+        for dep in mod.depends:
+            self._depmap[dep].remove(mod)
+        for prov in mod.provides:
+            for other in self._depmap[prov]:
+                self.remove_module(other.name)
+            self._depmap.pop(prov)
+        await mod.teardown()
+
     async def _get_named_event(self, verb: str):
         """Gets a named event for use in event dispatching
 
@@ -299,3 +335,23 @@ class IRCClient:
                 return result
             self._events(event).remove(inner)
         return result
+
+    async def load_extension(self, ext: str):
+        """Load an extension
+
+        :param ext: The import name of the module (e.g. cogs.myextension to import myextension from the cogs/ folder)
+        """
+        try:
+            mod = importlib.import_module(ext)
+            mod.setup(self, ext)
+            logging.debug(f"Extension '{ext}' was successfully set up")
+        except ModuleNotFoundError as e:
+            raise ExtensionFailed(f"Extension '{ext}' could not be loaded: Module not found") from e
+        except AttributeError as e:
+            raise ExtensionFailed(f"Extension '{ext}' does not implement a 'setup' function") from e
+    
+    async def unload_extension(self, ext: str):
+        for name, mod in self._exts:
+            if mod.importby == ext:
+                await self.remove_module(name)
+    
