@@ -1,6 +1,6 @@
 .idea/
 venv/
 Pipfile.lock
-testclient.*
+testclient*
 site/
 __pycache__/

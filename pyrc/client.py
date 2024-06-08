@@ -26,15 +26,7 @@ class IRCClient:
         self._task: Union[None, asyncio.Task] = None
         self._reader: Union[None, asyncio.StreamReader] = None
         self._writer: Union[None, asyncio.StreamWriter] = None
-        self._named_events = {
-            [
-                "PRIVMSG",
-            ]: "message",
-            [
-                "NOTICE",
-            ]: "notice",
-            ["403", "471", "473", "474", "475"]: "join_fail",
-        }
+        self._named_events = {}
         self._exts = {}
         self._depmap = {}
         self.host: Union[None, str] = None
@@ -127,6 +119,7 @@ class IRCClient:
             return "ready", None
         args = params[2]
         channel = None
+        msg = None
         if args[0].startswith(":"):
             msg = args
         else:
@@ -134,18 +127,19 @@ class IRCClient:
             for part in parse:
                 await asyncio.sleep(0)
                 if part.startswith(":"):
-                    message = parse[parse.index(part) :]
-                    msg = " ".join(message)
+                    messag = parse[parse.index(part) :]
+                    msg = " ".join(messag)
+                    break
                 if part.startswith("#"):
                     channel = await self.get_channel(part)
-                if verb == "PRIVMSG":
-                    msg = msg.lstrip(":")
-                    bmsg = bytes(msg, "UTF-8")
-                    if bmsg.startswith(self.ctcpchar) and bmsg.endswith(self.ctcpchar):
-                        bctcp = bmsg.strip(self.ctcpchar)
-                        ctcp = bctcp.decode("UTF-8")
-                        context = Context(message, author, channel, msg, ctcp)
-                        return "ctcp", context
+            if verb == "PRIVMSG":
+                msg = msg.lstrip(":")
+                bmsg = bytes(msg, "UTF-8")
+                if bmsg.startswith(self.ctcpchar) and bmsg.endswith(self.ctcpchar):
+                    bctcp = bmsg.strip(self.ctcpchar)
+                    ctcp = bctcp.decode("UTF-8")
+                    context = Context(message, author, channel, msg, ctcp)
+                    return "ctcp", context
         named = await self._get_named_event(verb)
         context = Context(
             message, author, channel, msg, None, named if named != verb else None
@@ -227,7 +221,7 @@ class IRCClient:
                 await self._dispatch_event("disconnect")
                 return
             except Exception as e:
-                print(traceback.format_exception(e))
+                print("\n".join(traceback.format_exception(e)))
                 await self.disconnect("Library error. Disconnected")
 
     async def send(self, message: str):
@@ -272,6 +266,9 @@ class IRCClient:
         )
         self._task = asyncio.create_task(self._loop())
         realname = kwargs.get("realname")
+        caps = kwargs.get("capabilities")
+        if caps is not None:
+            await self.send("CAP LS 302")
         if nickname is None:
             nickname = username
         if password is not None:
@@ -279,9 +276,24 @@ class IRCClient:
             await self.send(f"PASS {password}")
         await self.send(f"NICK {nickname}")
         await self.send(
-            f"USER {username} 8 * :{realname if realname is not None else username}"
+            f"USER {username} 0 * :{realname if realname is not None else username}"
         )
         await self._dispatch_event("connect")
+        if caps is not None:
+            """serv = await self.wait_for("on_cap")
+            caplist = serv.message.split(" ")
+            negotiate = []
+            for cap in caps:
+                if cap in caplist:
+                    negotiate.append(cap)"""
+            await self.send(f"CAP REQ :sasl")
+            result = await self.wait_for("on_cap")
+            for ack in result.message.split(" "):
+                self._depmap.setdefault(ack, [])
+        callbacks = kwargs.get("callbacks")
+        if callbacks is not None:
+            for cb in callbacks:
+                await cb(self)
         self.cmdwait = True
 
     async def disconnect(self, quit_message: str = None):
@@ -367,6 +379,7 @@ class IRCClient:
 
         async def inner(context=None):
             nonlocal result
+            logging.debug(f"Checking event {event} with arg {context}")
             if check(context):
                 result = context
                 done.set()
@@ -381,7 +394,7 @@ class IRCClient:
                     await asyncio.sleep(0)
                     self._events[evnt].remove(inner)
                 return result
-            self._events(event).remove(inner)
+            self._events[event].remove(inner)
         return result
 
     async def load_extension(self, ext: str):
