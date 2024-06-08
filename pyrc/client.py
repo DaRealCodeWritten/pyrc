@@ -16,19 +16,24 @@ Main client module for pyirc. This should always be imported
 
 class IRCClient:
     r"""
-        Client class for setting up a connection to an IRC server
-        :ivar host: a string representing the host that the client is connected to
-        :ivar port: the port number the client is connected to
+    Client class for setting up a connection to an IRC server
+    :ivar host: a string representing the host that the client is connected to
+    :ivar port: the port number the client is connected to
     """
+
     def __init__(self, **kwargs):
         self._events: Dict[str, List[Callable]] = {}
         self._task: Union[None, asyncio.Task] = None
         self._reader: Union[None, asyncio.StreamReader] = None
         self._writer: Union[None, asyncio.StreamWriter] = None
         self._named_events = {
-            ["PRIVMSG",]: "message",
-            ["NOTICE",]: "notice",
-            ["403", "471", "473", "474", "475"]: "join_fail"
+            [
+                "PRIVMSG",
+            ]: "message",
+            [
+                "NOTICE",
+            ]: "notice",
+            ["403", "471", "473", "474", "475"]: "join_fail",
         }
         self._exts = {}
         self._depmap = {}
@@ -39,13 +44,18 @@ class IRCClient:
         self.cmdwait = False
         self.chmodemap: Dict[str, List[extension.Extension]] = {}
         self.channels = set()
-        override_default_events: Union[None, Callable] = kwargs.get("override_default_events")
-        self.load_behavior: Union[Literal["lazy"], Literal["active"]] = kwargs.get("loading", "lazy")
+        override_default_events: Union[None, Callable] = kwargs.get(
+            "override_default_events"
+        )
+        self.load_behavior: Union[Literal["lazy"], Literal["active"]] = kwargs.get(
+            "loading", "lazy"
+        )
+        self.parser = self.parse
         if override_default_events:
             override_default_events(self)
             return
         pyrc.setup(self)
-    
+
     def add_module(self, module):
         """Adds and loads a new module to the client ecosystem
 
@@ -57,7 +67,10 @@ class IRCClient:
             if self._depmap.get(cap) is None:
                 for cap in module.depends:
                     self._depmap.pop(cap, None)
-                raise ExtensionFailed(f"Module '{module.__name__}' failed to load. One or more dependencies was not met")
+                raise ExtensionFailed(
+                    f"Module '{module.__name__}' failed to load. One or more dependencies was not met"
+                )
+            module.interfaces[cap] = self._exts.get(cap)
         for prov in module.provides:
             self._depmap.setdefault(prov, [])
         self._exts[module.name] = module
@@ -70,13 +83,18 @@ class IRCClient:
         """
         mod = self._exts.get(module_name)
         if mod is None:
-            raise ExtensionNotFound(f"Module '{module_name}' is either not loaded, or partially initialized")
+            raise ExtensionNotFound(
+                f"Module '{module_name}' is either not loaded, or partially initialized"
+            )
         self._exts.pop(module_name)
         for dep in mod.depends:
+            await asyncio.sleep(0)
             self._depmap[dep].remove(mod)
         for prov in mod.provides:
+            await asyncio.sleep(0)
             for other in self._depmap[prov]:
-                self.remove_module(other.name)
+                await asyncio.sleep(0)
+                await self.remove_module(other.name)
             self._depmap.pop(prov)
         await mod.teardown()
 
@@ -92,7 +110,6 @@ class IRCClient:
                 return value
         return verb
 
-    
     async def parse(self, message: str):
         """Parses a message, and returns the event name and Context (if the event takes a Context)
 
@@ -103,7 +120,10 @@ class IRCClient:
         params = message.split(" ", 2)
         author = IRCUser(params[0], self.chmodemap, self)
         verb = params[1]
-        if verb in ["422", "376"]:  # MOTD or NOMOTD verbs, this means that the connection has registered and on_ready can be emitted
+        if verb in [
+            "422",
+            "376",
+        ]:  # MOTD or NOMOTD verbs, this means that the connection has registered and on_ready can be emitted
             return "ready", None
         args = params[2]
         channel = None
@@ -114,7 +134,7 @@ class IRCClient:
             for part in parse:
                 await asyncio.sleep(0)
                 if part.startswith(":"):
-                    message = parse[parse.index(part):]
+                    message = parse[parse.index(part) :]
                     msg = " ".join(message)
                 if part.startswith("#"):
                     channel = await self.get_channel(part)
@@ -127,7 +147,9 @@ class IRCClient:
                         context = Context(message, author, channel, msg, ctcp)
                         return "ctcp", context
         named = await self._get_named_event(verb)
-        context = Context(message, author, channel, msg, None, named if named != verb else None)
+        context = Context(
+            message, author, channel, msg, None, named if named != verb else None
+        )
         return named, context
 
     async def get_channel(self, channel: str):
@@ -166,7 +188,9 @@ class IRCClient:
         evnt = func.__name__ if not events else events
         logging.debug(f"Registering callback for event(s) {evnt}")
         if not asyncio.iscoroutinefunction(func):
-            raise TypeError(f"Function \"{func.__name__}\" is type \"{type(func)}\", not a Coroutine")
+            raise TypeError(
+                f'Function "{func.__name__}" is type "{type(func)}", not a Coroutine'
+            )
         if isinstance(evnt, list):
             for event in evnt:
                 self._events.setdefault(event, []).append(func)
@@ -181,14 +205,16 @@ class IRCClient:
             try:
                 data = await self._reader.readline()
                 plaintext = data.decode().rstrip("\r\n")
-                if plaintext == "":  # No data, the connection is probably closed, so the loop can end
+                if (
+                    plaintext == ""
+                ):  # No data, the connection is probably closed, so the loop can end
                     return
                 await self._dispatch_event("raw", plaintext)
                 logging.debug(f"Received: {plaintext}")
                 if plaintext.startswith("PING"):  # Respond to PINGs with PONGs
                     await self.send(plaintext.replace("PING", "PONG"))
                     continue
-                event, ctx = await self.parse(plaintext)
+                event, ctx = await self.parser(plaintext)
                 if ctx:
                     await self._dispatch_event(event, ctx)
                     continue
@@ -211,9 +237,13 @@ class IRCClient:
         :raises NotConnectedError: If the client is not actually connected yet
         """
         if self._writer is None:
-            raise NotConnectedError("This IRCClient is not yet connected, call .connect first!")  # noqa: F405
+            raise NotConnectedError(
+                "This IRCClient is not yet connected, call .connect first!"
+            )  # noqa: F405
         if self.cmdwait and not message.startswith("PONG"):
-            logging.debug(f"Command \"{message}\" sent before connection was ready, deferring...")
+            logging.debug(
+                f'Command "{message}" sent before connection was ready, deferring...'
+            )
             self.cmdbuf.append(message)
             return
         encoded_msg = bytes(message + "\r\n", "UTF-8")
@@ -234,8 +264,12 @@ class IRCClient:
         use_ssl = kwargs.get("ssl")
         nickname = kwargs.get("nick")
         password = kwargs.get("password")
-        logging.info(f"Attempting to connect to IRCd at {host}:{'+' if use_ssl else ''}{port}")
-        self._reader, self._writer = await asyncio.open_connection(self.host, self.port, ssl=use_ssl)
+        logging.info(
+            f"Attempting to connect to IRCd at {host}:{'+' if use_ssl else ''}{port}"
+        )
+        self._reader, self._writer = await asyncio.open_connection(
+            self.host, self.port, ssl=use_ssl
+        )
         self._task = asyncio.create_task(self._loop())
         realname = kwargs.get("realname")
         if nickname is None:
@@ -244,10 +278,11 @@ class IRCClient:
             logging.debug("Attempting to authenticate with the provided password")
             await self.send(f"PASS {password}")
         await self.send(f"NICK {nickname}")
-        await self.send(f"USER {username} 8 * :{realname if realname is not None else username}")
+        await self.send(
+            f"USER {username} 8 * :{realname if realname is not None else username}"
+        )
         await self._dispatch_event("connect")
         self.cmdwait = True
-        
 
     async def disconnect(self, quit_message: str = None):
         """
@@ -260,7 +295,7 @@ class IRCClient:
         await self._task
         logging.info("Disconnected and loop closed.")
         await self._dispatch_event("disconnect")
-    
+
     async def join_channel(self, channel: Union[str, List[str]]):
         """
         Joins a channel or list of channels
@@ -272,7 +307,10 @@ class IRCClient:
             for chan in channel:
                 try:
                     await self.send(f"JOIN {chan}")
-                    res = await self.wait_for(["on_join", "on_join_fail"], lambda ctx: str(ctx.channel) in [None, chan])
+                    res = await self.wait_for(
+                        ["on_join", "on_join_fail"],
+                        lambda ctx: str(ctx.channel) in [None, chan],
+                    )
                     if res.event == "join_fail":
                         yield None
                     yield res.channel
@@ -282,14 +320,17 @@ class IRCClient:
             return
         await self.send(f"JOIN {channel}")
         try:
-            res = await self.wait_for(["on_join", "on_join_fail"], lambda ctx: str(ctx.channel) in [None, channel])
+            res = await self.wait_for(
+                ["on_join", "on_join_fail"],
+                lambda ctx: str(ctx.channel) in [None, channel],
+            )
             if res.event == "join_fail":
                 yield None
             yield res.channel
         except asyncio.TimeoutError:
             yield None
-    
-    async def ctcpreply(self, nick: str, query: str, reply:str):
+
+    async def ctcpreply(self, nick: str, query: str, reply: str):
         """
         Reply to a received CTCP query from the given nick
         :param nick: The nick of the user who sent us the CTCP query
@@ -297,7 +338,7 @@ class IRCClient:
         :param reply: What we're responding with
         """
         await self.send(f"NOTICE {nick} \x01{query} {reply}\x01")
-    
+
     async def ctcp(self, nick: str, query: str):
         """
         Send a CTCP query to the specified `nick`
@@ -305,8 +346,13 @@ class IRCClient:
         :param query: The query we are sending
         """
         await self.send(f"PRIVMSG {nick} :\x01{query}\x01")
-    
-    async def wait_for(self, event: Union[str, list], check: Callable = lambda args: True, timeout: float = 30):
+
+    async def wait_for(
+        self,
+        event: Union[str, list],
+        check: Callable = lambda args: True,
+        timeout: float = 30,
+    ):
         """Waits for a specified event to occur, and returns the result
 
         :param event: The name (or names) of the event(s) to wait for. Returns the first event that matches
@@ -318,11 +364,13 @@ class IRCClient:
         """
         result = False
         done = asyncio.Event()
-        async def inner(context = None):
+
+        async def inner(context=None):
             nonlocal result
             if check(context):
                 result = context
                 done.set()
+
         self.event(inner, event)
         try:
             async with asyncio.timeout(timeout):
@@ -340,18 +388,26 @@ class IRCClient:
         """Load an extension
 
         :param ext: The import name of the module (e.g. cogs.myextension to import myextension from the cogs/ folder)
+        :raises ExtensionFailed: If the extension couldn't be loaded
         """
         try:
             mod = importlib.import_module(ext)
             mod.setup(self, ext)
             logging.debug(f"Extension '{ext}' was successfully set up")
         except ModuleNotFoundError as e:
-            raise ExtensionFailed(f"Extension '{ext}' could not be loaded: Module not found") from e
+            raise ExtensionFailed(
+                f"Extension '{ext}' could not be loaded: Module not found"
+            ) from e
         except AttributeError as e:
-            raise ExtensionFailed(f"Extension '{ext}' does not implement a 'setup' function") from e
-    
+            raise ExtensionFailed(
+                f"Extension '{ext}' does not implement a 'setup' function"
+            ) from e
+
     async def unload_extension(self, ext: str):
+        """Unloads the given extension
+
+        :param ext: The extension to unload
+        """
         for name, mod in self._exts:
             if mod.importby == ext:
                 await self.remove_module(name)
-    

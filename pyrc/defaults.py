@@ -25,15 +25,17 @@ class _DefaultEventHandlers:
         parse = preparse[1].split(" :")
         nicks = parse[1].split(" ")
         for nick in nicks:
-            ctx.channel.cache.add(pyrc.IRCUser(nick, self.client.chmodemap, self.client))
+            ctx.channel.cache.add(
+                pyrc.IRCUser(nick, self.client.chmodemap, self.client)
+            )
             await asyncio.sleep(0)
-    
+
     async def on_366(self, ctx):
         """
         Default handler for numeric event 366 (END OF NAMES), causes the affected channel to sync its temporary userlist to the permanent userlist
         """
         ctx.channel.sync()
-    
+
     async def on_join(self, ctx):
         """
         Default handler for on_join, handles registering the channel with the client lib for IRCClient.get_channel
@@ -54,6 +56,7 @@ class _DefaultEventHandlers:
             await self.client.send(message)
             await asyncio.sleep(1)
         self.client.cmdbuf = []
+
 
 def setup(client):
     """

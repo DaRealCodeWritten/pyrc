@@ -13,6 +13,7 @@ class AsyncDict(dict):
     """
     Dictionary supporting asynchronous iteration to avoid blocking running event loops
     """
+
     async def __aiter__(self):
         for key, value in self.items():
             await asyncio.sleep(0)
@@ -25,10 +26,11 @@ class IRCObjectSendable:
     :param client: IRCClient object that this object is bound to
     :param sendable: A string that denotes the PRIVMSG/NOTICE target
     """
+
     def __init__(self, client, sendable: str):
         self.client = client
         self.sendable = sendable
-    
+
     async def send_to(self, message: str):
         """Sends a message to the target of this IRC object
 
@@ -48,11 +50,14 @@ class IRCUser(IRCObjectSendable):
     :ivar host: The host/vhost of this User, may be None if this user is lazily loaded (default)
     :ivar user: The username of this User, may be None if this user is lazily loaded (default)
     """
+
     def __init__(self, user_string: str, chmapping: Dict[str, str], client):
         self.raw = user_string
         self.raw.lstrip(":")
         self.chmapping = chmapping
-        self.nick, self.user, self.host = re.search(r"^(\S+?)(?:!(\S+?)@(\S+))?$", self.raw).groups()
+        self.nick, self.user, self.host = re.search(
+            r"^(\S+?)(?:!(\S+?)@(\S+))?$", self.raw
+        ).groups()
         self.nick = self.nick.lstrip(":")
         if self.user is not None:
             self.chmodes = self._get_chmodes()
@@ -92,6 +97,7 @@ class IRCChannel(IRCObjectSendable):
     :ivar users: A set of IRCUser objects in this channel
     :type users: Set[IRCUser]
     """
+
     def __init__(self, name: str, client):
         self.name = name
         self.chmodes = None
@@ -110,9 +116,10 @@ class IRCChannel(IRCObjectSendable):
         self.users = self.cache.copy()
         self.cache.clear()
         self.is_caching = False
-    
+
     def __str__(self):
         return self.name
+
 
 class Context:
     """
@@ -129,6 +136,7 @@ class Context:
     :ivar message: The trailer for the event (is not always a message), if any
     :ivar ctcp: The CTCP data in this event, if any
     """
+
     def __init__(
         self,
         raw: str,
@@ -136,7 +144,7 @@ class Context:
         channel: Union[IRCChannel, None] = None,
         message: Union[str, None] = None,
         ctcp: Union[str, None] = None,
-        event: Union[str, None] = None
+        event: Union[str, None] = None,
     ):
         self.author = author
         self.channel = channel
