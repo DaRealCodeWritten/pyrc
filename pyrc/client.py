@@ -6,12 +6,16 @@ import importlib
 from pyrc.errors import *  # noqa: F403
 from pyrc.classes import *  # noqa: F403
 from pyrc.ext import extension
+from pyrc.util import authhelper
 from typing import Union, Dict, Callable, List, Literal
 
 
 __doc__ = """
 Main client module for pyirc. This should always be imported
 """
+
+
+logger = logging.getLogger("client")
 
 
 class IRCClient:
@@ -42,6 +46,7 @@ class IRCClient:
         self.load_behavior: Union[Literal["lazy"], Literal["active"]] = kwargs.get(
             "loading", "lazy"
         )
+        self.capabilities: Dict[str, Union[None, List[str]]] = {}
         self.parser = self.parse
         if override_default_events:
             override_default_events(self)
@@ -101,6 +106,19 @@ class IRCClient:
             if verb in keys:
                 return value
         return verb
+
+    async def register_caps(self, caps: List[str]):
+        capabilities = {}
+        for cap in caps:
+            await asyncio.sleep(0)
+            breakdown = cap.split("=")
+            if len(breakdown) > 1:
+                args = breakdown[1].split(",")
+                capabilities[breakdown[0]] = args
+                self._depmap.setdefault(cap, [])
+                continue
+            capabilities[cap] = None
+        return capabilities
 
     async def parse(self, message: str):
         """Parses a message, and returns the event name and Context (if the event takes a Context)
@@ -167,9 +185,9 @@ class IRCClient:
         """
         events = self._events.get("on_" + event.lower())
         if events is None:
-            logging.debug(f"No events to call for event {event}")
+            logger.debug(f"No events to call for event {event}")
             return
-        logging.debug(f"Dispatching on_{event} to {len(events)} listeners")
+        logger.debug(f"Dispatching on_{event} to {len(events)} listeners")
         await asyncio.gather(*(callback(*args) for callback in events))
 
     def event(self, func, events: Union[str, List[str], None] = None):
@@ -180,7 +198,7 @@ class IRCClient:
         :param events: Event name(s), if the coro's name is not the event name
         """
         evnt = func.__name__ if not events else events
-        logging.debug(f"Registering callback for event(s) {evnt}")
+        logger.debug(f"Registering callback for event(s) {evnt}")
         if not asyncio.iscoroutinefunction(func):
             raise TypeError(
                 f'Function "{func.__name__}" is type "{type(func)}", not a Coroutine'
@@ -204,7 +222,7 @@ class IRCClient:
                 ):  # No data, the connection is probably closed, so the loop can end
                     return
                 await self._dispatch_event("raw", plaintext)
-                logging.debug(f"Received: {plaintext}")
+                logger.debug(f"Received: {plaintext}")
                 if plaintext.startswith("PING"):  # Respond to PINGs with PONGs
                     await self.send(plaintext.replace("PING", "PONG"))
                     continue
@@ -217,7 +235,7 @@ class IRCClient:
                 print(f"Didn't understand {plaintext}", end="")
                 continue
             except ConnectionResetError:
-                logging.error("Connection lost.")
+                logger.error("Connection lost.")
                 await self._dispatch_event("disconnect")
                 return
             except Exception as e:
@@ -235,7 +253,7 @@ class IRCClient:
                 "This IRCClient is not yet connected, call .connect first!"
             )  # noqa: F405
         if self.cmdwait and not message.startswith("PONG"):
-            logging.debug(
+            logger.debug(
                 f'Command "{message}" sent before connection was ready, deferring...'
             )
             self.cmdbuf.append(message)
@@ -243,7 +261,7 @@ class IRCClient:
         encoded_msg = bytes(message + "\r\n", "UTF-8")
         self._writer.write(encoded_msg)
         await self._writer.drain()
-        logging.debug(f"Sent: {message}")
+        logger.debug(f"Sent: {message}")
 
     async def connect(self, host: str, port: int, username: str, **kwargs):
         """
@@ -255,10 +273,19 @@ class IRCClient:
         """
         self.host = host
         self.port = port
+        authmethods = {
+            "ns": authhelper.ns_authenticate,
+            "sasl": authhelper.sasl_authenticate,
+        }
         use_ssl = kwargs.get("ssl")
         nickname = kwargs.get("nick")
         password = kwargs.get("password")
-        logging.info(
+        realname = kwargs.get("realname")
+        caps = kwargs.get("capabilities")
+        callbacks = kwargs.get("callbacks")
+        method = kwargs.get("auth_method")
+        authargs = kwargs.get("auth_params")
+        logger.info(
             f"Attempting to connect to IRCd at {host}:{'+' if use_ssl else ''}{port}"
         )
         self._reader, self._writer = await asyncio.open_connection(
@@ -272,7 +299,7 @@ class IRCClient:
         if nickname is None:
             nickname = username
         if password is not None:
-            logging.debug("Attempting to authenticate with the provided password")
+            logger.debug("Attempting to authenticate with the provided password")
             await self.send(f"PASS {password}")
         await self.send(f"NICK {nickname}")
         await self.send(
@@ -280,17 +307,23 @@ class IRCClient:
         )
         await self._dispatch_event("connect")
         if caps is not None:
-            """serv = await self.wait_for("on_cap")
-            caplist = serv.message.split(" ")
+            serv = await self.wait_for("on_cap")
+            servcaps = await self.register_caps(serv.message.lstrip(":").split(" "))
             negotiate = []
             for cap in caps:
-                if cap in caplist:
-                    negotiate.append(cap)"""
-            await self.send(f"CAP REQ :sasl")
-            result = await self.wait_for("on_cap")
-            for ack in result.message.split(" "):
-                self._depmap.setdefault(ack, [])
-        callbacks = kwargs.get("callbacks")
+                if cap in servcaps.keys():
+                    negotiate.append(cap)
+            await self.send(f"CAP REQ :{' '.join(negotiate)}")
+            capresp = await self.wait_for("on_cap")
+            self.capabilities = await self.register_caps(
+                capresp.message.lstrip(":").split(" ")
+            )
+        if method and authargs:
+            func = authmethods.get(method)
+            assert func
+            await func(self, *authargs)
+        else:
+            await self.send("CAP END")
         if callbacks is not None:
             for cb in callbacks:
                 await cb(self)
@@ -305,7 +338,7 @@ class IRCClient:
         await self.send(f"QUIT :{quit_message if quit_message else 'Quit'}")
         self._writer.close()
         await self._task
-        logging.info("Disconnected and loop closed.")
+        logger.info("Disconnected and loop closed.")
         await self._dispatch_event("disconnect")
 
     async def join_channel(self, channel: Union[str, List[str]]):
@@ -379,7 +412,7 @@ class IRCClient:
 
         async def inner(context=None):
             nonlocal result
-            logging.debug(f"Checking event {event} with arg {context}")
+            logger.debug(f"Checking event {event} with arg {context}")
             if check(context):
                 result = context
                 done.set()
@@ -406,7 +439,7 @@ class IRCClient:
         try:
             mod = importlib.import_module(ext)
             mod.setup(self, ext)
-            logging.debug(f"Extension '{ext}' was successfully set up")
+            logger.debug(f"Extension '{ext}' was successfully set up")
         except ModuleNotFoundError as e:
             raise ExtensionFailed(
                 f"Extension '{ext}' could not be loaded: Module not found"
