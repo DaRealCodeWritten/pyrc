@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import pyrc
+import ssl
 import traceback
 import importlib
 from pyrc.errors import *  # noqa: F403
@@ -288,8 +289,11 @@ class IRCClient:
         logger.info(
             f"Attempting to connect to IRCd at {host}:{'+' if use_ssl else ''}{port}"
         )
+        sslobj = None
+        if use_ssl is True:
+            sslobj = ssl.create_default_context()
         self._reader, self._writer = await asyncio.open_connection(
-            self.host, self.port, ssl=use_ssl
+            self.host, self.port, ssl=sslobj
         )
         self._task = asyncio.create_task(self._loop())
         realname = kwargs.get("realname")
