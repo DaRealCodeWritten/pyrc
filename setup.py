@@ -6,6 +6,6 @@ setup(
     description="An asynchronous, event-driven IRC client library for Python",
     author="Emma Lysne",
     author_email="ytcodew@gmail.com",
-    packages=["pyrc"],
+    packages=["pyrc", "pyrc.ext", "pyrc.util"],
     install_requires=["wheel", "pysasl"],
 )
