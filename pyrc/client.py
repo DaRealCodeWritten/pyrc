@@ -416,7 +416,6 @@ class IRCClient:
 
         async def inner(context=None):
             nonlocal result
-            logger.debug(f"Checking event {event} with arg {context}")
             if check(context):
                 result = context
                 done.set()

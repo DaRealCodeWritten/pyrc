@@ -4,3 +4,6 @@ Pipfile.lock
 testclient*
 site/
 __pycache__/
+pyrc.*/
+build/
+dist/

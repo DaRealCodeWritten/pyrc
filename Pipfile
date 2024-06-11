@@ -13,6 +13,7 @@ mkdocs-material = "*"
 mkdocs-git-revision-date-localized-plugin = "*"
 mkdocs-git-authors-plugin = "*"
 black = "*"
+build = "*"
 
 [requires]
 python_version = "3.12"
