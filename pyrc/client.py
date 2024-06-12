@@ -209,7 +209,7 @@ class IRCClient:
                 self._events.setdefault(event, []).append(func)
             return
         self._events.setdefault(evnt, []).append(func)
-    
+
     def remove_event(self, event_name: str, func: Callable):
         events = self._events.get(event_name)
         try:
