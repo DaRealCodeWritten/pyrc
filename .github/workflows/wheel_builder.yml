@@ -1,0 +1,37 @@
+on:
+    push:
+        branches:
+            master
+
+jobs:
+    format_black:
+        name: Black Formatter
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+            - name: Check Code
+              uses: rickstaa/action-black@v1
+              with: 
+                black_args: "./pyrc --check"
+
+    wheel_builder:
+        name: Wheel Builder
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install dependencies
+              uses: VaultVulp/action-pipenv@v2.0.1
+              with:
+                command: install -d
+
+            - name: Build wheels
+              uses: VaultVulp/action-pipenv@v2.0.1
+              with:
+                command: run pip wheel -w ./dist
+            
+            - name: Store Wheels
+              uses: actions/upload-artifact@v4
+              with:
+                name: Package Wheels
+                path: dist/pyrc*.whl
