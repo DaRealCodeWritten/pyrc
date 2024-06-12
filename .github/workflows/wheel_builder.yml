@@ -32,7 +32,7 @@ jobs:
             - name: Build wheels
               uses: VaultVulp/action-pipenv@v2.0.1
               with:
-                command: run pip wheel -w ./dist
+                command: run pip wheel -w ./dist .
             
             - name: Store Wheels
               uses: actions/upload-artifact@v4
