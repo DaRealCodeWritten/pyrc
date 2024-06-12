@@ -20,6 +20,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+            - name: Configure Python runner
+              uses: VaultVulp/action-pipenv@v2.0.1
+              with:
+                command: pipenv --python $(which python3)
             - name: Install dependencies
               uses: VaultVulp/action-pipenv@v2.0.1
               with:
