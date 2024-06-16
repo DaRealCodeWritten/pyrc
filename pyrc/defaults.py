@@ -27,6 +27,8 @@ class _DefaultEventHandlers:
         logger.debug(f"Received names for {ctx.channel.name}, caching")
         ctx.channel.is_caching = True
         preparse = ctx.raw.split(" = ")
+        if len(preparse) == 1:
+            preparse = ctx.raw.split(" * ")
         parse = preparse[1].split(" :")
         nicks = parse[1].split(" ")
         for nick in nicks:
@@ -41,6 +43,10 @@ class _DefaultEventHandlers:
         """
         logger.debug(f"End of names for {ctx.channel.name}, syncing")
         ctx.channel.sync()
+
+    async def on_396(self, ctx):
+        preparse = ctx.raw.split(" ")
+        self.client.user.host = preparse[3]
 
     async def on_join(self, ctx):
         """

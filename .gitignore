@@ -1,9 +1,23 @@
-.idea/
-venv/
-Pipfile.lock
-testclient*
-site/
+# Ignore PyCaches
 *__pycache__/
-pyrc.*/
-build/
+__pycache__/
+pyrc/__pycache__/*.pyc
+
+# Ignore test code
+testclient.*
+
+# Ignore virtualenv/packaging files
+Pipfile.lock
+venv/
+
+# Ignore compilation files
 dist/
+build/
+pyrc.*/
+
+# Ignore IDE files
+.idea/
+
+# Ignore docs files
+site/
+

@@ -32,15 +32,16 @@ class IRCClient:
         self._reader: Union[None, asyncio.StreamReader] = None
         self._writer: Union[None, asyncio.StreamWriter] = None
         self._named_events = {}
-        self._exts = {}
-        self._depmap = {}
+        self._exts: Dict[str, extension.Extension] = {}
+        self._depmap: Dict[str, List[extension.Extension]] = {}
         self.host: Union[None, str] = None
         self.port: Union[None, int] = None
-        self.ctcpchar = bytes("\x01", "UTF-8")
-        self.cmdbuf = []
-        self.cmdwait = False
-        self.chmodemap: Dict[str, List[extension.Extension]] = {}
-        self.channels = set()
+        self.ctcpchar: bytes = bytes("\x01", "UTF-8")
+        self.cmdbuf: List[str] = []
+        self.cmdwait: bool = False
+        self.user: Union[IRCUser, None] = None
+        self.chmodemap: Dict[str, str] = {}
+        self.channels: set = set()
         override_default_events: Union[None, Callable] = kwargs.get(
             "override_default_events"
         )
@@ -48,7 +49,7 @@ class IRCClient:
             "loading", "lazy"
         )
         self.capabilities: Dict[str, Union[None, List[str]]] = {}
-        self.parser = self.parse
+        self.parser: Callable = self.parse
         if override_default_events:
             override_default_events(self)
             return
@@ -135,7 +136,7 @@ class IRCClient:
             "422",
             "376",
         ]:  # MOTD or NOMOTD verbs, this means that the connection has registered and on_ready can be emitted
-            return "ready", None
+            yield "ready", None
         args = params[2]
         channel = None
         msg = None
@@ -158,12 +159,15 @@ class IRCClient:
                     bctcp = bmsg.strip(self.ctcpchar)
                     ctcp = bctcp.decode("UTF-8")
                     context = Context(message, author, channel, msg, ctcp)
-                    return "ctcp", context
+                    yield "ctcp", context
+                    return
         named = await self._get_named_event(verb)
         context = Context(
             message, author, channel, msg, None, named if named != verb else None
         )
-        return named, context
+        if verb.isnumeric():
+            yield "nnn", context
+        yield named, context
 
     async def get_channel(self, channel: str):
         """Gets the specified channel from the set of channels
@@ -189,7 +193,12 @@ class IRCClient:
             logger.debug(f"No events to call for event {event}")
             return
         logger.debug(f"Dispatching on_{event} to {len(events)} listeners")
-        await asyncio.gather(*(callback(*args) for callback in events))
+        try:
+            await asyncio.gather(*(callback(*args) for callback in events))
+        except Exception as e:
+            logger.error(
+                "Ignoring exception thrown in event callback", exc_info=1, stack_info=1
+            )
 
     def event(self, func, events: Union[str, List[str], None] = None):
         """
@@ -235,13 +244,13 @@ class IRCClient:
                 if plaintext.startswith("PING"):  # Respond to PINGs with PONGs
                     await self.send(plaintext.replace("PING", "PONG"))
                     continue
-                event, ctx = await self.parser(plaintext)
-                if ctx:
-                    await self._dispatch_event(event, ctx)
-                    continue
-                await self._dispatch_event(event)
-            except IndexError:
-                print(f"Didn't understand {plaintext}", end="")
+                async for event, ctx in self.parser(plaintext):
+                    if ctx:
+                        await self._dispatch_event(event, ctx)
+                        continue
+                    await self._dispatch_event(event)
+            except IndexError as e:
+                logger.error(f"Didn't understand {plaintext}", exc_info=1)
                 continue
             except ConnectionResetError:
                 logger.error("Connection lost.")
@@ -294,6 +303,7 @@ class IRCClient:
         callbacks = kwargs.get("callbacks")
         method = kwargs.get("auth_method")
         authargs = kwargs.get("auth_params")
+        chmodemap = kwargs.get("chmodes", {})
         logger.info(
             f"Attempting to connect to IRCd at {host}:{'+' if use_ssl else ''}{port}"
         )
@@ -336,6 +346,8 @@ class IRCClient:
             await func(self, *authargs)
         else:
             await self.send("CAP END")
+        self.chmodemap = chmodemap
+        self.user = IRCUser(nickname, self.chmodemap, self)
         if callbacks is not None:
             for cb in callbacks:
                 await cb(self)

@@ -22,7 +22,7 @@ class AsyncDict(dict):
 
 class IRCObjectSendable:
     """
-    Object class for IRC objects, implements a .send_to() method for sending messages that target this object
+    Object class for IRC objects, implements a send() method for sending messages that target this object
     :param client: IRCClient object that this object is bound to
     :param sendable: A string that denotes the PRIVMSG/NOTICE target
     """
@@ -31,7 +31,7 @@ class IRCObjectSendable:
         self.client = client
         self.sendable = sendable
 
-    async def send_to(self, message: str):
+    async def send(self, message: str):
         """Sends a message to the target of this IRC object
 
         :param message: The message to send
@@ -55,9 +55,10 @@ class IRCUser(IRCObjectSendable):
         self.raw = user_string
         self.raw.lstrip(":")
         self.chmapping = chmapping
-        self.nick, self.user, self.host = re.search(
-            r"^(\S+?)(?:!(\S+?)@(\S+))?$", self.raw
-        ).groups()
+        res = re.search(r"^(\S+?)(?:!(\S+?)@(\S+))?$", self.raw)
+        self.nick, self.user, self.host = (
+            res.groups() if res is not None else [user_string, None, None]
+        )
         self.nick = self.nick.lstrip(":")
         if self.user is not None:
             self.chmodes = self._get_chmodes()
