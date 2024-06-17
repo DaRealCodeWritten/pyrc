@@ -194,13 +194,16 @@ class IRCClient:
             return
         logger.debug(f"Dispatching on_{event} to {len(events)} listeners")
         try:
-            results = await asyncio.gather(*(callback(*args) for callback in events), return_exceptions=True)
+            results = await asyncio.gather(
+                *(callback(*args) for callback in events), return_exceptions=True
+            )
             for result in results:
                 if issubclass(result, Exception):
                     logger.error("Ignoring exception thrown in event callback")
         except Exception as e:
             logger.error(
-                f"Ignoring exception thrown while dispatching on_{event.lower()}", exc_info=1
+                f"Ignoring exception thrown while dispatching on_{event.lower()}",
+                exc_info=1,
             )
 
     def event(self, func, events: Union[str, List[str], None] = None):

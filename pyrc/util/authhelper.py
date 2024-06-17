@@ -45,14 +45,14 @@ async def sasl_authenticate(client, methods: List[bytes], user: str, pwd: str):
             continue
 
 
-async def ns_authenticate(client, pwd: str, user: str=None):
+async def ns_authenticate(client, pwd: str, user: str = None):
     """Try authenticating using PRIVMSG NickServ IDENTIFY
 
     :param client: The IRCClient that is authenticating
     :type client: IRCClient
     :param pwd: A string representing the password we are authenticating with
     :param user: The username we're authenticating with
-    """    
+    """
     logger.info("Trying to authenticate using method nickserv")
     await client.send(
         f"PRIVMSG NickServ :IDENTIFY {f'{user} {pwd}' if user is not None else pwd}"
