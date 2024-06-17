@@ -8,7 +8,7 @@ from pyrc.errors import *  # noqa: F403
 from pyrc.classes import *  # noqa: F403
 from pyrc.ext import extension
 from pyrc.util import authhelper
-from typing import Union, Dict, Callable, List, Literal
+from typing import Union, Dict, Callable, List, Literal, Optional, Tuple
 
 
 __doc__ = """
@@ -194,10 +194,13 @@ class IRCClient:
             return
         logger.debug(f"Dispatching on_{event} to {len(events)} listeners")
         try:
-            await asyncio.gather(*(callback(*args) for callback in events))
+            results = await asyncio.gather(*(callback(*args) for callback in events), return_exceptions=True)
+            for result in results:
+                if issubclass(result, Exception):
+                    logger.error("Ignoring exception thrown in event callback")
         except Exception as e:
             logger.error(
-                "Ignoring exception thrown in event callback", exc_info=1, stack_info=1
+                f"Ignoring exception thrown while dispatching on_{event.lower()}", exc_info=1
             )
 
     def event(self, func, events: Union[str, List[str], None] = None):
